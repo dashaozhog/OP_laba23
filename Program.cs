@@ -13,33 +13,39 @@ public delegate void Notify(string filePath);
 
 class FileDownloaderPublisher
 {
-    public event Notify DownloadCompleted = filePath => Console.WriteLine($"File {filePath} successfully downloaded!");
-    public void RaiseEvent(string filePath)
+    public event Notify DownloadCompleted = filePath => 
+    {   
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"File {filePath} successfully downloaded!");
+        Console.ResetColor();
+
+    };
+    private void RaiseEvent(string filePath)
     {
         DownloadCompleted?.Invoke(filePath);
+    }
+
+    public void DownloadFile(string filePath)
+    {
+        Console.WriteLine($"Downloading {filePath}");
+        Console.ForegroundColor = ConsoleColor.DarkYellow;
+        for (int i = 0; i < 10; i++) {
+            Console.Write("-");
+            Thread.Sleep(500);
+        } 
+        Console.WriteLine();
+        RaiseEvent(filePath);
+       
     }
 }
 
 
 class Program
 {
-   delegate List<string> DoubleDel(int count, string elem);
-
-    static List<string> GenList(int count, string elem)
-    {
-        var list = new List<string>();
-        for(int i = 0; i< count; i++)
-        {
-            list.Add(elem);
-        }
-        return list;
-    }
    static void Main(string[] args)
     {
-        DoubleDel method = GenList;
-        foreach(string n in method(10, "TEST")) {
-            Console.Write(n);
-        }
+        var fd = new FileDownloaderPublisher();
+        fd.DownloadFile("test.txt");
         
     }
 }
