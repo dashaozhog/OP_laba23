@@ -13,29 +13,24 @@ public delegate void Notify(string filePath);
 
 class FileDownloaderPublisher
 {
-    public event Notify DownloadCompleted = filePath => 
-    {   
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"File {filePath} successfully downloaded!");
-        Console.ResetColor();
-
-    };
-    private void RaiseEvent(string filePath)
-    {
-        DownloadCompleted?.Invoke(filePath);
-    }
+    public event Notify DownloadCompleted;
 
     public void DownloadFile(string filePath)
     {
         Console.WriteLine($"Downloading {filePath}");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 6; i++) {
             Console.Write("-");
             Thread.Sleep(500);
         } 
         Console.WriteLine();
-        RaiseEvent(filePath);
+        OnDownloadCompleted(filePath);
+        
        
+    }
+    protected virtual void OnDownloadCompleted(string filePath)
+    {
+        DownloadCompleted?.Invoke(filePath);
     }
 }
 
@@ -45,7 +40,15 @@ class Program
    static void Main(string[] args)
     {
         var fd = new FileDownloaderPublisher();
+        fd.DownloadCompleted += OnFileDownloaded;
         fd.DownloadFile("test.txt");
         
+    }
+
+    static void OnFileDownloaded(string filePath)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"File {filePath} successfully downloaded!");
+        Console.ResetColor();
     }
 }
