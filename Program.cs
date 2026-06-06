@@ -9,37 +9,46 @@
 
 //Виводити повідомлення: "Файл успішно завантажено!".
 
+
+// оголошуємо делегат для події
 public delegate void Notify(string filePath);
 
+// клас-видавець
 class FileDownloaderPublisher
 {
+    //створюємо подію
     public event Notify DownloadCompleted;
 
+    //метод видавця для завантаження файлу
     public void DownloadFile(string filePath)
     {
         Console.WriteLine($"Downloading {filePath}");
         Console.ForegroundColor = ConsoleColor.DarkYellow;
+
+        //строка завантаження
         for (int i = 0; i < 6; i++) {
             Console.Write("-");
             Thread.Sleep(500);
         } 
         Console.WriteLine();
+        //виклик події через protected метод
         OnDownloadCompleted(filePath);
-        
-       
+  
     }
     protected virtual void OnDownloadCompleted(string filePath)
     {
+        //перевірка чи не null подія, яку збираємось викликати
         DownloadCompleted?.Invoke(filePath);
     }
 }
 
-
+// клас-підписник
 class Program
 {
    static void Main(string[] args)
     {
         var fd = new FileDownloaderPublisher();
+        // до івенту за принципом мультикаст делегатів додається метод
         fd.DownloadCompleted += OnFileDownloaded;
         fd.DownloadFile("test.txt");
         
